@@ -18,7 +18,11 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'role', 'name', 'email', 'password',
+    ];
+
+    protected $attributes = [
+        'role' => 'user'
     ];
 
     /**
@@ -38,4 +42,34 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // user has many articles
+    public function articles()
+    {
+        return $this->hasMany('App\Article', 'author_id');
+    }
+
+    // user has many comments
+    public function comments()
+    {
+        return $this->hasMany('App\Comment', 'from_user');
+    }
+
+    public function can_post()
+    {
+        $role = $this->role;
+        if ($role == 'author' || $role == 'admin') {
+            return true;
+        }
+        return false;
+    }
+
+    public function is_admin()
+    {
+        $role = $this->role;
+        if ($role == 'admin') {
+            return true;
+        }
+        return false;
+    }
 }

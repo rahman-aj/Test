@@ -14,7 +14,12 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        //
+        //fetch posts from database which are active and latest
+        $articles = Article::where('active', 1)->orderBy('created_at', 'desc');
+        //page heading
+        $title = 'Latest Articles';
+        //return home.blade.php template from resources/views folder
+        return view('home')->withPosts($articles)->withTitle($title);
     }
 
     /**
@@ -22,9 +27,13 @@ class ArticleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        if ($request->user()->can_post()) {
+            return view('articles.create');
+        } else {
+            return redirect('/')->withErrors('You have not sufficient permissions for writing article');
+        }
     }
 
     /**
